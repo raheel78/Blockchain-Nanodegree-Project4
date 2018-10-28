@@ -34,7 +34,8 @@ class BlockController {
       let bodydata = req.body.data;
       console.log('Body Data is:   ' + bodydata);
       if (bodydata === undefined || bodydata === null) {
-        res.status(500).send('Block body is empty or undefined!');
+        let err_obj = new Error(`Bummer: Missing 'data' key in POST Request`);
+        res.status(500).json({error: err_obj.message});
       }
       else {
         let newblock_prom = this.blockchainService.addBlock(new Block(bodydata));

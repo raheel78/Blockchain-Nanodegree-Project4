@@ -15,8 +15,6 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
-
 You need to have setup following softwares/frameworks on your machine before running this project:
 
 ```
@@ -32,12 +30,12 @@ You need to have setup following softwares/frameworks on your machine before run
 Below instructions are assuming that you have already *node js* and *npm* installed on your machine
 
 ```
-0. You can first check if node js is already installed on your machine by running *node --version*
-1. After cloning/downloading the repository, run npm install in the folder where all project files are sitting
-2. This will install all the dependencies from package.json file
-3. In order to determine if all frameworks are successfully installed, inspect the current folder and you should find an additional folder created with the name *node_modules*
+1. You can first check if node js is already installed on your machine by running *node --version*
+2. After cloning/downloading the repository, run npm install in the folder where all project files are sitting
+3. This will install all the dependencies from package.json file
+4. In order to determine if all frameworks are successfully installed, inspect the current folder and you should find an additional folder created with the name *node_modules*
 
-4. If all above steps have been executed without any issue, then you should be ready to run this framework. Give it a try and run:  node app.js, you should see some lines as following:
+5. If all above steps have been executed without any issue, then you should be ready to run this framework. Give it a try and run:  node app.js, you should see some lines as following:
 
         inside constructor ..... 
         Server Listening for port: 8000
@@ -46,16 +44,21 @@ Below instructions are assuming that you have already *node js* and *npm* instal
         block saved
         index is:   0
 
-5. Till this point, you are good to go and can start calling REST endpoints for GET and POST
+6. Till this point, you are good to go and can start calling REST endpoints for GET and POST (See next sections)
 ```
 
 ## Running the tests
 
 Testing of this project is mainly constitute of sending and receiving request and responses via GET and POST. In the subsequent sections, you will find few examples as how to test both successful and failed responses which are expecting out of this RESTful framework. Testing can make use of either '*curl*' which is a command line tool. Or you can go for more sophisticated GUI based tool, such as; *Postman*.
 
+Below given instructions are only catering using curl command line tool as this tool is relatively easy to use. All you need is to make sure that `curl` is installed on your machine. Follow the instructions given on link (https://help.ubidots.com/how-to-with-ubidots/learn-how-to-install-run-curl-on-windowsmacosxlinux).
+
+
 Remember that:
 - Base Path for API is '/'
 - Content-Type header for all requests is *application/json*
+- Port 8000 will be used for this service to listen for requests
+
 
 ### GET /block/{blockHeight}
 

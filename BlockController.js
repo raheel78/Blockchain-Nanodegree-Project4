@@ -22,7 +22,7 @@ class BlockController {
       blockheight_prom.then(block => {
         res.send(block);
       }).catch(err => {
-        return res.status(500).send(err);   // bad request with error code
+        return res.status(500).send("Invalid Block: This Block Number is not present in the chain");   // bad request with error code
       });
     }
 
@@ -33,8 +33,8 @@ class BlockController {
     postNewBlock(req, res) {
       let bodydata = req.body.data;
       console.log('Body Data is:   ' + bodydata);
-      if (bodydata === undefined || bodydata === null) {
-        let err_obj = new Error(`Bummer: Missing 'data' key in POST Request`);
+      if (bodydata === undefined || bodydata === null || bodydata === '') {
+        let err_obj = new Error(`Missing block data: Missing 'data' key in POST Request`);
         res.status(500).json({error: err_obj.message});
       }
       else {

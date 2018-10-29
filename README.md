@@ -30,12 +30,13 @@ You need to have setup following softwares/frameworks on your machine before run
 Below instructions are assuming that you have already *node js* and *npm* installed on your machine
 
 ```
-1. You can first check if node js is already installed on your machine by running *node --version*
-2. After cloning/downloading the repository, run npm install in the folder where all project files are sitting
-3. This will install all the dependencies from package.json file
-4. In order to determine if all frameworks are successfully installed, inspect the current folder and you should find an additional folder created with the name *node_modules*
+1. You can first check if node js is already installed on your machine by running **node --version**. The output should be something like:
+    v8.12.0
+2. After cloning/downloading the repository, run `npm install` in the folder where all project files are sitting
+3. This will install all the dependencies from `package.json` file
+4. In order to determine if all frameworks are successfully installed, inspect the current folder and you should find an additional folder created with the name **node_modules**
 
-5. If all above steps have been executed without any issue, then you should be ready to run this framework. Give it a try and run:  node app.js, you should see some lines as following:
+5. If all above steps have been executed without any issue, then you should be ready to run this framework. Give it a try and run:  `node app.js`, you should see some lines as following:
 
         inside constructor ..... 
         Server Listening for port: 8000

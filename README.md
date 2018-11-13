@@ -1,23 +1,31 @@
-# Project 3 - RESTful Web API with Node.js Framework
+# Project 4 - Build a Private Blockchain Notary Service
 
-This project will help establish a RESTful version of Web API whereby a client will be able to call REST end points for reading (GETing) and adding (POSTing) new blocks in the blockchain. A framework (levelDB) will enable the permanent storage persistance of block data with all necessary formalities (block hashing, height and chaining previous hash etc.). Project has been coded using Node JS libraries.
+Welcome to Project 4: Build a Private Blockchain Notary Service!
+
+In this project, we'll build a Star Registry service that allows users to claim ownership of their favorite star in the night sky.
+
+To do this, we'll add functionality to the Web API you built in Project 3: Web Services. We will connect this web service to our own private blockchain, allowing users to notarize ownership of a digital asset, in this case whichever star they choose.
+
 
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
 
 1. Download or clone this repo to a local folder on your machine
-    - git clone https://github.com/raheel78/Blockchain-Nanodegree-Project3.git
+    - git clone https://github.com/raheel78/Blockchain-Nanodegree-Project4.git
 2. Open terminal (MAC/linux) or command prompt (windows variants) on your desktop
 3. Run `npm install` to install dependencies from package.json
-4. Run `node app.js`
-5. Server should listen on port 8000 (make sure this port should remain free to test this)
+4. Run `node index.js`
+5. Server should listen on port 8000 (make sure this port should remain free to test this project)
 
 ### Prerequisites
 
-You need to have setup following softwares/frameworks on your machine before running this project:
+You need to have setup following frameworks on your machine before running this project:
 
 ```
+- bitcoinjs-lib@4.0.2
+- bitcoinjs-message@2.0.0
+- joi@14.0.4
 - crypto-js@3.1.9-1
 - body-parser@1.18.3
 - express@4.16.4
@@ -31,28 +39,27 @@ Below instructions are assuming that you have already *node js* and *npm* instal
 
 
 >1. You can first check if node js is already installed on your machine by running **node --version**. The output should be something like:
-    v8.12.0
+    **v10.13.0**
 >2. After cloning/downloading the repository, run `npm install` in the folder where all project files are sitting
 >3. This will install all the dependencies from `package.json` file
 >4. In order to determine if all frameworks are successfully installed, inspect the current folder and you should find an additional folder created with the name **node_modules**
 
->5. If all above steps have been executed without any issue, then you should be ready to run this framework. Give it a try and run:  `node app.js`, you should see some lines as following:
+>5. If all above steps have been executed without any issue, then you should be ready to run this framework. Give it a try and run:  `node index.js`, you should see some lines as following:
 
         inside constructor ..... 
-        Server Listening for port: 8000
+        Visit: http://localhost:8000
         Blockchain DB is empty. Creating new Blockchain with 1 genesis block...
-        chain length = 0, return null instead of block
-        block saved
-        index is:   0
+        Block Added:: Height is:   0
 
->6. Till this point, you are good to go and can start calling REST endpoints for GET and POST (See next sections)
+>6. Till this point, you are good to go and can start calling REST endpoints for GET and POST (See next sections).
 
 
 ## Running the tests
 
 Testing of this project is mainly constitute of sending and receiving request and responses via GET and POST. In the subsequent sections, you will find few examples as how to test both successful and failed responses which are expecting out of this RESTful framework. Testing can make use of either '*curl*' which is a command line tool. Or you can go for more sophisticated GUI based tool, such as; *Postman*.
 
-Below given instructions are only catering using curl command line tool as this tool is relatively easy to use. All you need is to make sure that `curl` is installed on your machine. Follow the instructions given on link (https://help.ubidots.com/how-to-with-ubidots/learn-how-to-install-run-curl-on-windowsmacosxlinux).
+**NOTE:** 
+Below given instructions are only catering using POSTMAN GUI. All you need is to make sure that `POSTMAN` is installed on your machine.
 
 
 Remember that:
@@ -61,72 +68,172 @@ Remember that:
 - Port 8000 will be used for this service to listen for requests
 
 
-### GET /block/{blockHeight}
+#### GET star(s) from the chain
+From POSTMAN make a GET request to the following end-point to GET the Genesis block.
 
-This will allows to read block information through its height which is nothing but a numeric value presenting at what position the block is sitting in the blockchain. 
-
-An example would be:
-
-##### REQUEST
-```
-curl -X GET \
-  http://localhost:8000/block/0 \
-  -H 'Cache-Control: no-cache' \
-  -H 'Content-Type: application/json' \
-```
-Above example command will help retrieve the block at position 0 (the genesis block) from the chain, the response from above command would be similar to below (yours might be bit different):
-
-##### RESPONSE
+GET http://localhost:8000/block/0
+The response from the blockchain should be a JSON block object representing the Genesis block:
 ```
 {
-    "hash": "f3a9d0254f3d9ee6a4a207755fcc4804d5b38e28ba16ce42f144d8ed619fbebb",
-    "height": 0,
-    "body": "First block in the chain - Genesis block",
-    "time": "1540705789",
-    "previousBlockHash": ""
+"hash": "8583615f16626a274a0af332f7723b7838dfac70264b260d1e12cc1667548be3",
+"height": 0,
+"body": "First block in the chain - Genesis block",
+"time": "1542104377",
+"previousBlockHash": ""
 }
 ```
 
-### POST /block/
+If the second block has not yet been added to the blockchain, then getting the second block should yield a commensurate error message. For example if the followiing command is executed in the REST client before the second block is added:
 
-POST request will be used to add a new block to the blockchain. You can use curl command (similar to above one) for adding a block. A sample curl command for POST is given below:
+GET http://localhost:8000/block/1
+The server should respond as follows with a 400 Bad Request status code:
+```
+{
+    "status_code": 400,
+    "status": "Failed retrieving Resource",
+    "reason": "Bad Request. Block with height 1 does not exist"
+}
+```
+If for a certain block height, there exists a star, then the server would respond with the corresponding star object as follows.
 
-##### Request
 ```
-curl -X POST \
-  http://localhost:8000/block/ \
-  -H 'Cache-Control: no-cache' \
-  -H 'Content-Type: application/json' \
-  -D '{"data":"some sample block"}'
-```
-The above command should produce below output:
-
-##### Response - Success
-```
-Body Data is:   Some data block
-chain length is 1, return previous block
-block saved
-```
-
-##### RESPONSE - Failure Rrequest
-If the data is missing in the curl command, such as:
-```
-curl -X POST \
-  http://localhost:8000/block/ \
-  -H 'Cache-Control: no-cache' \
-  -H 'Content-Type: application/json' \
-  -D ''
-```
-
-then the response would be something like below:
-```
-{"error":"Bummer: Missing 'data' key in POST Request"}
+{
+    "hash": "8583615f16626a274a0af332f7723b7838dfac70264b260d1e12cc1667548be3",
+    "height": 1,
+    "body": {
+        "address": "1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj",
+        "star": {
+            "dec": "-27o 20o",
+            "ra": "09h 20m 7.0s",
+            "story": "5468697320697320746865207365636f6e642073746172",
+            "storyDecoded": "This is the second star"
+        }
+    },
+    "time": "1542104440",
+    "previousBlockHash": "507e50f6d4d986cd3ac0559264253ff7e13a712f9e7eda4330afb57f05ca2225"
+}
 ```
 
-Make sure that no block will be created in the chain if the data is missing to POST request.
+#### POST Requests Associated with the Notary Service
+
+From POSTMAN make a POST request to the following end-point to start the validation process of a user request to register a star.
+
+POST http://localhost:8000/requestValidation
+
+Make sure that the request body has a JSON content type and the body of the request contains the address as your wallet address (you can get this address from either bitcoin tesnet or Electrum wallet). A wallet address example is below:
+```
+{
+ "address": "1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj"
+}
+```
+The request body example depicted above is a JSON object with a address attribute set to 1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj. With successfull execution of the POST request, the server should respond as follows.
+
+```
+{
+    "address": "1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj",
+    "requestTimeStamp": "1542108428",
+    "message": "1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj:1542108428:starRegistry",
+    "validationWindow": 300
+}
+```
+
+### Failure Scenario - address missing or not defined properly
+
+In this case, the request will fail with below response from server:
+
+```
+{
+    "status_code": 400,
+    "status": "Input Validation Failed.",
+    "reason": "Bad Request. \"address\" is required"
+}
+```
+
+The following response is obtained from the server when there is a redundant attribute called name in the request body.
+
+```
+{
+    "status_code": 400,
+    "status": "Input Validation Failed.",
+    "reason": "Bad Request. \"name\" is not allowed"
+}
+```
+
+The following response is obtained from the server when the address attribute is not a valid string.
+
+```
+{
+    "status_code": 400,
+    "status": "Input Validation Failed.",
+    "reason": "Bad Request. \"address\" must be a string"
+}
+```
+
+After receiving a message from the valid response of the previous request, the user can use his bitcoin wallet to sign the message using the same wallet address he used to initiate the request. 
+
+Signing the message will get a signature like the one mentioned below:
+
+```IOOCbNDRMd+Qb00DBCQ0Qah6ORGRhl+nSpOo6CrTS1PEcnPNwFbkZYWuQtzvyubw/ztwlOE+CFT8unW/JdNgRyU=```
+
+Through POSTMAN, make a POST request to the following end-point to end the validation process of a user request and register a star with the wallet address and message signature from the previous steps.
+
+POST http://localhost:8000/message-signature/validate
+
+You need two attributes as mentioned below to validate the message signature:
+```
+{
+     "address": "1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj",
+     "signature":"IOOCbNDRMd+Qb00DBCQ0Qah6ORGRhl+nSpOo6CrTS1PEcnPNwFbkZYWuQtzvyubw/ztwlOE+CFT8unW/JdNgRyU="
+}
+```
+With successfull execution of the POST request, the server should respond as follows.
+```
+{
+    "registerStar": true,
+    "status": {
+        "address": "1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj",
+        "requestTimeStamp": "1542109544",
+        "message": "1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj:1542109544:starRegistry",
+        "validationWindow": 271,
+        "messageSignature": "valid"
+    }
+}
+```
+After configuring the Blockchain validation routine, you can configure the star registration endpoint. Make a POST request to the following end-point to register a star:
+
+POST http://localhost:8000/block
+
+Make sure that the request body has a JSON content type. The request body should atleast contain the following payload type for a successfull star registration.
+
+```
+{
+  "address": "1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj",
+  "star": {
+    "dec": "-27o 20o",
+    "ra": "09h 20m 7.0s",
+    "story": "This is the second star"
+  }
+}
+```
+
+The server will respond as follows with a blockchain block containing the information of the registered star.
+
+```
+{
+    "hash": "d1736dad1e3dfe9edda209979241acafc2f761375b65512cf125dff78d24d973",
+    "height": 1,
+    "body": {
+        "address": "1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj",
+        "star": {
+            "dec": "-27o 20o",
+            "ra": "09h 20m 7.0s",
+            "story": "5468697320697320746865207365636f6e642073746172"
+        }
+    },
+    "time": "1542109612",
+    "previousBlockHash": "49195fa01ed7b83025763582d460acf525c215da05d38a01f1e1dfbc88e81ebd"
+}
+```
 
 
-### Link to Project Review from Udacity
-
-[Review: RESTful Web API with Node.js Framework](https://review.udacity.com/?utm_campaign=ret_000_auto_ndxxx_submission-reviewed&utm_source=blueshift&utm_medium=email&utm_content=reviewsapp-submission-reviewed&bsft_clkid=8bea6c4f-4dc4-472e-9da1-11f055327751&bsft_uid=7e10c4ef-b590-4ef2-8f90-4d141154ce37&bsft_mid=3b0b7eae-65d8-441e-ab95-91101e759325&bsft_eid=6f154690-7543-4582-9be7-e397af208dbd&bsft_txnid=c8f05308-596e-400e-9266-7cdd91a9eb14#!/reviews/1533230)
 

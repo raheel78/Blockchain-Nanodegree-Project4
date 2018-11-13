@@ -137,7 +137,7 @@ The request body example depicted above is a JSON object with a address attribut
 }
 ```
 
-### Failure Scenario - address missing or not defined properly
+##### Failure Scenario - address missing or not defined properly
 
 In this case, the request will fail with below response from server:
 
@@ -169,6 +169,8 @@ The following response is obtained from the server when the address attribute is
 }
 ```
 
+#### POST End Point - Message Signature Validation
+
 After receiving a message from the valid response of the previous request, the user can use his bitcoin wallet to sign the message using the same wallet address he used to initiate the request. 
 
 Signing the message will get a signature like the one mentioned below:
@@ -199,6 +201,9 @@ With successfull execution of the POST request, the server should respond as fol
     }
 }
 ```
+
+#### POST End Point - Star Registration
+
 After configuring the Blockchain validation routine, you can configure the star registration endpoint. Make a POST request to the following end-point to register a star:
 
 POST http://localhost:8000/block
@@ -236,4 +241,59 @@ The server will respond as follows with a blockchain block containing the inform
 ```
 
 
+
+#### GET End Point - Querying Block in Blockchain by 'address' and 'hash'
+
+
+In project 3, we have implemented REST service to query blocks using blockchain block height. We can also look up the stars registered against a certain wallet address. Make a GET request to the following endpoint with a wallet address.
+
+GET http://localhost:8000/stars/address:[ADDRESS]
+
+The server will respond as follows with a JSON response containing all the star objects registered against the given wallet address:
+
+```
+[
+    {
+        "hash": "d1736dad1e3dfe9edda209979241acafc2f761375b65512cf125dff78d24d973",
+        "height": 1,
+        "body": {
+            "address": "1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj",
+            "star": {
+                "dec": "-27o 20o",
+                "ra": "09h 20m 7.0s",
+                "story": "5468697320697320746865207365636f6e642073746172",
+                "storyDecoded": "This is the second star"
+            }
+        },
+        "time": "1542109612",
+        "previousBlockHash": "49195fa01ed7b83025763582d460acf525c215da05d38a01f1e1dfbc88e81ebd"
+    }
+]
+```
+
+A star can also be looked up against a block **hash** value as demonstrated below:
+
+GET http://localhost:8000/stars/hash:[HASH]
+
+The server will respond as follows with a JSON response containing the star object registered against the given block hash in the blockchain.
+
+```
+[
+    {
+        "hash": "d1736dad1e3dfe9edda209979241acafc2f761375b65512cf125dff78d24d973",
+        "height": 1,
+        "body": {
+            "address": "1479jYUTvcW3wpTvHQ7o6WikyaHx4WEMCj",
+            "star": {
+                "dec": "-27o 20o",
+                "ra": "09h 20m 7.0s",
+                "story": "5468697320697320746865207365636f6e642073746172",
+                "storyDecoded": "This is the second star"
+            }
+        },
+        "time": "1542109612",
+        "previousBlockHash": "49195fa01ed7b83025763582d460acf525c215da05d38a01f1e1dfbc88e81ebd"
+    }
+]
+```
 

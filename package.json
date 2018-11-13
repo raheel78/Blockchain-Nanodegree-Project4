@@ -1,17 +1,28 @@
 {
-  "name": "project3",
+  "name": "project_4",
   "version": "1.0.0",
-  "description": "",
+  "description": "Build a Private Blockchain Notary Service",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raheel78/Blockchain-Nanodegree-Project4.git"
+  },
   "author": "RK",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/raheel78/Blockchain-Nanodegree-Project4/issues"
+  },
+  "homepage": "https://github.com/raheel78/Blockchain-Nanodegree-Project4#readme",
   "dependencies": {
+    "bitcoinjs-lib": "^4.0.2",
+    "bitcoinjs-message": "^2.0.0",
     "body-parser": "^1.18.3",
     "crypto-js": "^3.1.9-1",
     "express": "^4.16.4",
+    "joi": "^14.0.4",
     "level": "^4.0.0"
   }
 }

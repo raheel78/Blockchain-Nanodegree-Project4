@@ -5,6 +5,7 @@ const Block = require('./Block');
 
 //Actual blockchain class - will be exposed as SERVICE to the controller class for encapsulating the functionality
 class Blockchain {
+
     constructor(db){
         console.log('inside constructor ..... ');
         this.chain = db;
@@ -20,107 +21,142 @@ class Blockchain {
         });
     }
 
-    getChain() {
+    async getChain() {
         return this.chain;
     }
 
-    addBlock(newBlock){
-        let _this = this;
-        return new Promise((resolve, reject) => {
-            newBlock.time = new Date().getTime().toString().slice(0,-3);
-            _this.chain.getChainLength().then(chainLength => {
-                newBlock.height = chainLength;
-                if(chainLength === 0) {
-                    return new Promise((resolve, reject) => {
-                        console.log("chain length = 0, return null instead of block");
-                        resolve(null);
-                    });
-                } else {
-                    console.log(`chain length is ${chainLength}, return previous block`);
-                    return _this.chain.getBlock(chainLength - 1);
+
+    // Add new block
+    async addBlock(newBlock) {
+        try {
+            let chainLength = await this.getBlockHeight();
+            // Block height
+            //console.log(`Length is ${chainLength}`);
+            newBlock.height = chainLength;
+            // UTC timestamp
+            newBlock.time = new Date().getTime().toString().slice(0, -3);
+
+            if (chainLength > 0) {
+                try {
+                    newBlock.previousBlockHash = await this.chain.getHashOfBlock(chainLength - 1);
+                } catch (e) {
+                    console.log(e.message);
+                    return;
                 }
-            }).then(previousBlock => {
-                if(previousBlock === null) {
-                    newBlock.previousBlockHash = "";
-                } else {
-                    newBlock.previousBlockHash = previousBlock.hash;
-                }
-                newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
-                return _this.chain.saveBlock(newBlock);
-            }).then(saveOperationResult => {
-                console.log("block saved");
-                resolve(saveOperationResult);
-            }).catch(err => {
-                reject(new Error(`${err.message}`));
-            });
-        });
+            }
+            // Block hash with SHA256 using newBlock and converting to a string
+            newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
+            // Adding block object to chain
+            await this.chain.saveBlock(newBlock.height,JSON.s tringify(newBlock).toString());
+            console.log(`Block Added:: Height is:  `, chainLength);
+            return newBlock;
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-    getBlockHeight() {
-        let _this = this;
-        return new Promise((resolve, reject) => {
-            _this.chain.getChainLength().then(currentLength => {
-                resolve(currentLength);
-            }).catch(err => {
-                reject(new Error(`${err.message}`));
-            });
-        });
+    // Get block height
+    async getBlockHeight() {
+        try {
+            let height = await this.chain.getChainLength();
+            return height;
+        } catch (e) {
+            return e;
+        }
     }
 
-    getBlock(blockHeight){
-        return new Promise((resolve, reject) => {
-            this.chain.getBlock(blockHeight).then(block => {
-                resolve(block);
-            }).catch(err => {
-                reject(new Error(`${err.message}`));
-            });
-        });
+    // GET block
+    async getBlock(blockHeight) {
+        try {
+            let block = await this.chain.getBlock(blockHeight);
+            return block;
+        } catch (e) {
+            console.log(e.message);
+        }
     }
 
-    validateBlock(blockHeight){
-        let _this = this;
-        return new Promise(function(resolve, reject){
-            _this.chain.getBlock(blockHeight).then(block => {
+    // GET all stars for a certain wallet address
+    async getAllStarsOfWallet(walletAdress) {
+        try {
+            let stars = await this.chain.starsOfWalletAddress(walletAdress);
+            return stars;
+        } catch (e) {
+            console.log("getAllStarsOfWallet ===>  ", e.stack);
+        }
+    }
+
+    // GET the star given a certain blockHash
+    async getStarAgainstHash(blockHash) {
+        try {
+            let hash_stars = await this.chain.starAgainstHash(blockHash);
+            return hash_stars;
+        } catch (e) {
+            console.log(e.stack);
+        }
+
+    }
+
+    // validate block
+    async validateBlock(blockHeight) {
+
+        return new Promise(async (resolve, reject) => {
+
+            // get block object
+            let block = await this.getBlock(blockHeight);
+            block = JSON.parse(block);
+
+            // get block hash
+            let blockHash = block.hash;
+            // remove block hash to test block integrity
+            block.hash = '';
+            // generate block hash
+            let validBlockHash = SHA256(JSON.stringify(block)).toString();
+            // Compare
+            if (blockHash === validBlockHash) {
+                resolve(true);
+            } else {
+                console.log('Block #' + blockHeight + ' invalid hash:\n' + blockHash + '<>' + validBlockHash);
+                resolve(false);
+            }
+
+        });
+
+    }
+
+    // Validate blockchain
+    async validateChain() {
+        let errorLog = [];
+        let chainLength = await this.getBlockHeight() + 1;
+        for (let i = 0; i < chainLength; i++) {
+            // validate block
+            let validStatus = await this.validateBlock(i);
+            if (!validStatus) {
+                errorLog.push(i);
+            }
+
+            if (i < chainLength - 1) {
+
+                // compare blocks hash link
+                let block = await this.getBlock(i);
+                block = JSON.parse(block);
                 let blockHash = block.hash;
-                block.hash = '';
-                let validBlockHash = SHA256(JSON.stringify(block)).toString();
-                if (blockHash === validBlockHash) {
-                    resolve(true);
-                } else {
-                    reject(new Error('Block #'+blockHeight+' invalid hash:\n'+blockHash+'<>'+validBlockHash));
-                }
-            });
-        });
-    }
 
-    validateChain() {
-        let errors = [];
-        let _this = this;
-        return new Promise((resolve, reject) => {
-            _this.chain.getChainLength()
-                .then(currentLength => {
-                    let allBlockValidations = [];
-                    for(let i = 0; i < currentLength; i++) {
-                        allBlockValidations.push(
-                            _this.validateBlock(i)
-                                .catch(err => {
-                                    errors.push(err);
-                                })
-                        );
-                    }
-                    return Promise.all(allBlockValidations);
-                })
-                .then(value => {
-                    if(errors.length > 0) {
-                        reject(errors);
-                    } else {
-                        resolve(true);
-                    }
-                })
-                .catch(err => {
-                    reject(err);
-                });
-        });
+                let prevBlock = await this.getBlock(i + 1);
+                prevBlock = JSON.parse(prevBlock);
+                let prevBlockHash = prevBlock.previousBlockHash;
+
+                if (blockHash !== prevBlockHash) {
+                    errorLog.push(i);
+                }
+            }
+
+        }
+        if (errorLog.length > 0) {
+            console.log('Block errors = ' + errorLog.length);
+            console.log('Blocks: ' + errorLog);
+        } else {
+            console.log('No errors detected');
+        }
     }
 }
 module.exports = Blockchain;

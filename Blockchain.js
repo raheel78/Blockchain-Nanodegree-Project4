@@ -47,7 +47,7 @@ class Blockchain {
             // Block hash with SHA256 using newBlock and converting to a string
             newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
             // Adding block object to chain
-            await this.chain.saveBlock(newBlock.height,JSON.s tringify(newBlock).toString());
+            await this.chain.saveBlock(newBlock.height,JSON.stringify(newBlock).toString());
             console.log(`Block Added:: Height is:  `, chainLength);
             return newBlock;
         } catch (e) {

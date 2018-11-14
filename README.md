@@ -40,18 +40,21 @@ Below instructions are assuming that you have already *node js* and *npm* instal
 
 >1. You can first check if node js is already installed on your machine by running **node --version**. The output should be something like:
     **v10.13.0**
->2. After cloning/downloading the repository, run `npm install` in the folder where all project files are sitting
->3. This will install all the dependencies from `package.json` file
->4. In order to determine if all frameworks are successfully installed, inspect the current folder and you should find an additional folder created with the name **node_modules**
+>2. After cloning/downloading the repository, run `npm install` in the folder where all project files are sitting. You should see last 2 lines after installation is done, as shown below:
+```
+    added 168 packages from 103 contributors and audited 800 packages in 18.154s
+    found 0 vulnerabilities
+```
+>3. In order to determine if all frameworks are successfully installed, inspect the current folder and you should find an additional folder created with the name **node_modules**
 
->5. If all above steps have been executed without any issue, then you should be ready to run this framework. Give it a try and run:  `node index.js`, you should see some lines as following:
+>4. If all above steps have been executed without any issue, then you should be ready to run this framework. Give it a try and run:  `node index.js`, you should see some lines as following:
 
         inside constructor ..... 
         Visit: http://localhost:8000
         Blockchain DB is empty. Creating new Blockchain with 1 genesis block...
         Block Added:: Height is:   0
 
->6. Till this point, you are good to go and can start calling REST endpoints for GET and POST (See next sections).
+>5. Till this point, you are good to go and can start calling REST endpoints for GET and POST (See next sections).
 
 
 ## Running the tests

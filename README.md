@@ -300,3 +300,12 @@ The server will respond as follows with a JSON response containing the star obje
 ]
 ```
 
+
+### Udacity Project Reviews
+
+- Link to 1st Review
+https://review.udacity.com/?utm_campaign=ret_000_auto_ndxxx_submission-reviewed&utm_source=blueshift&utm_medium=email&utm_content=reviewsapp-submission-reviewed&bsft_clkid=77312615-81c9-4fb1-a06f-08c54be7b838&bsft_uid=7e10c4ef-b590-4ef2-8f90-4d141154ce37&bsft_mid=61e9781e-6d28-4fab-9188-19403d6b60c3&bsft_eid=6f154690-7543-4582-9be7-e397af208dbd&bsft_txnid=84c724c8-1d37-4c1d-b897-6d2f1309f49e#!/reviews/1564126
+
+
+- Link to 2nd Review
+https://review.udacity.com/?utm_campaign=ret_000_auto_ndxxx_submission-reviewed&utm_source=blueshift&utm_medium=email&utm_content=reviewsapp-submission-reviewed&bsft_clkid=c638554b-3306-40ad-866a-c29206129a96&bsft_uid=7e10c4ef-b590-4ef2-8f90-4d141154ce37&bsft_mid=61e9781e-6d28-4fab-9188-19403d6b60c3&bsft_eid=6f154690-7543-4582-9be7-e397af208dbd&bsft_txnid=84c724c8-1d37-4c1d-b897-6d2f1309f49e#!/reviews/1564889

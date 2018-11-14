@@ -14,13 +14,16 @@ const {
   validateRequest,
   starRegistrationSchema,
   asciiToHexa,
-  hexaToAscii
+  hexaToAscii,
 } = require('./SchemaDefs');
 
 const PORT = 8000;
 
 // This is a global cache that will store validation requests for a certain time period
 let requestCache = {};
+
+// Global "signature" variable to hold the manually generated signature string
+let signature = "";
 
 // Initialising the blockchain with genesis block on server startup
 let blockDb = new BlockDB('./start-notary-db');
@@ -194,11 +197,12 @@ app.post('/block', async (req, res) => {
         reason: null,
     };
 
+    console.log("result.error:    ",result.error)
     // If request doesnt conform to schema, then send error as response
     if (result.error) {
         let reason = `Bad Request. ${result.error.details[0].message}`;
         response.status_code = 400;
-        response.status = "Input Validation Failed.";
+        response.status = "Input Validation Failed";
         response.reason = reason;
 
         return res.status(response.status_code)
@@ -209,7 +213,7 @@ app.post('/block', async (req, res) => {
     if (req.body.star.story.split(" ").length > 250) {
         let reason = `Star story has to be 250 or less words`;
         response.status_code = 400;
-        response.status = "Input Validation Failed.";
+        response.status = "Input Validation Failed";
         response.reason = reason;
         return res.status(response.status_code)
                   .send(response);
@@ -222,9 +226,20 @@ app.post('/block', async (req, res) => {
 
     if (!requestObject) {
         response.status_code = 400;
-        response.status = "Star Registration Failed.";
+        response.status = "Star Registration Failed";
         response.reason = "Validation request was not made within validation window or the given" +
-            " wallet address never made a prior request validation request.";
+            " wallet address never made a prior request validation request";
+        return res.status(response.status_code)
+                  .send(response);
+    }
+
+    //verify the message using bitcoin functions and the provided signature and cached message
+    // "message": "address:requestTimeStamp:starRegistry"
+    if (validateSignature(requestObject.message, address, signature) !== true) {
+        response.status_code = 400;
+        response.status = "Signature Validation Failed.";
+        response.reason = "The provided credentials failed to sign the message, hence STAR block " +
+                "registration cannot be processed!";
         return res.status(response.status_code)
                   .send(response);
     }
@@ -328,7 +343,6 @@ app.post('/message-signature/validate', async (req, res) => {
         response.status_code = 400;
         response.status = "Input Validation Failed.";
         response.reason = reason;
-
         return res.status(response.status_code)
                   .send(response);
     }
@@ -336,15 +350,14 @@ app.post('/message-signature/validate', async (req, res) => {
     // Request body is in correct conformation with schema.
     // 1. Check if signature validation request was made within validation window or not
     let address = req.body.address;
-    let signature = req.body.signature;
+    signature = req.body.signature;
     let requestObject = requestCache[address];
 
     if (!requestObject) {
         response.status_code = 400;
-        response.status = "Signature Validation Failed.";
+        response.status = "Signature Validation Failed";
         response.reason = "Validation request was not made within validation window or the given " +
             "wallet address is invalid!";
-
         return res.status(response.status_code)
                   .send(response);
     }
@@ -353,7 +366,7 @@ app.post('/message-signature/validate', async (req, res) => {
     //verify the message using bitcoin functions and the provided signature and cached message
     if (validateSignature(requestObject.message, address, signature) !== true) {
         response.status_code = 400;
-        response.status = "Signature Validation Failed.";
+        response.status = "Signature Validation Failed";
         response.reason = "The provided credentials failed to sign the message!!";
         return res.status(response.status_code)
                   .send(response);

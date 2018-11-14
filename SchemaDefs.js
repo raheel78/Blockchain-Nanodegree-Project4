@@ -21,7 +21,7 @@ const starRegistrationSchema = {
                                 ra: Joi.string().min(3).required(),
                                 magnitude: Joi.string().min(3),
                                 constellation: Joi.string().min(3),
-                                story: Joi.string().min(3).required()
+                                story: Joi.string().min(3).regex(/[a-zA-Z0-9]/).required()
                             })
 };
 
@@ -57,6 +57,17 @@ function validateSignature(message, address, signature) {
         return e.message;
     }
 }
+
+// validate if string has only ASCII characters
+function isAsciiOnly(str) {
+    console.log("Story is:   ", str, str.length)
+    let retval = true;
+    for (let i = 0; i<str.length; i++)
+        if (str.charCodeAt(i) > 127)
+            retval = false;
+    return retval;
+}
+
 
 module.exports = {
     blockSchema,

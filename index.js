@@ -42,13 +42,20 @@ app.get('/block/:height', async (req, res) => {
     let block = await blockChain.getBlock(height);
 
     // If LevelDB returns a block, send that block as a JSON response to client
-    if (block) {
-        let jsonBlock = JSON.parse(block);
-        if (jsonBlock.body.star) {
-            jsonBlock.body.star["storyDecoded"] = hexaToAscii(jsonBlock.body.star.story);
-        }
-        return res.set("Content-Type", "application/json")
-                  .send(jsonBlock);
+    try {
+      if (block) {
+          //console.log(block);
+          //console.log(JSON.stringify(block));
+          let jsonBlock = JSON.parse(JSON.stringify(block));
+          if (jsonBlock.body.star) {
+              jsonBlock.body.star["storyDecoded"] = hexaToAscii(jsonBlock.body.star.story);
+          }
+          return res.set("Content-Type", "application/json")
+                    .send(jsonBlock);
+      }
+    }
+    catch(e) {
+      console.log("Exception:  ", e.stack);
     }
 
     // If LevelDB doesnt return a block, then send an error object
